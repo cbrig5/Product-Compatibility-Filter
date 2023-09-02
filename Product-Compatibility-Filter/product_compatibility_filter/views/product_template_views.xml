@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_product_form" model='ir.ui.view'>
+        <field name="name">product.template.product.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='detailed_type']" position="after">
+                <field name='is_part' />
+                <field name='part_compatibility' widget="many2many_tags"
+                    options="{'no_create_edit': False}"
+                    attrs="{'invisible': [('is_part', '=', False)]}" />
+                <field name='part_compatibility_status' attrs="{'invisible':1}" />
+                <field name="product_classification" options="{'no_create_edit': False}"
+                    attrs="{'invisible': [('is_part', '=', True)], 'required':[('is_part', '=', False)]}" />
+                <field name="related_product_specification_names"
+                    attrs="{'invisible': [('is_part', '=', True)]}" widget='many2many_tags' />
+            </xpath>
+
+            <xpath expr="//page[@name='general_information']" position="after">
+                <page string="Specifications">
+                    <field name="product_specification_line"
+                        attrs="{'invisible': [('is_part', '=', True)]}">
+                        <tree editable="bottom">
+                            <field name="product_specification_name_id"
+                                domain="[('id', 'in', parent.related_product_specification_names)]"
+                                required='1' />
+                            <field name="product_specification_value_id" required='1' />
+                        </tree>
+                    </field>
+
+                    <field name='related_part_specification_names' invisible='1' />
+                    <field name="part_specification_line"
+                        attrs="{'invisible': [('is_part', '=', False)]}">
+                        <tree editable="bottom">
+                            <field name="part_specification_name_id"
+                                domain="[('id', 'in', parent.related_part_specification_names)]"
+                                required='1' />
+                            <field name="part_specification_value_id" required='1'
+                                widget='many2many_tags' />
+                        </tree>
+                    </field>
+                </page>
+
+                <page string="Compatible Products"
+                    attrs="{'invisible': ['|',('part_compatibility_status', '=', False), ('is_part', '=', False)]}">
+                    <field name='products' invisible="1" />
+                    <field name="compatible_prods" domain="[('id', 'in', products)]">
+                        <tree>
+                            <!-- Invisible fields -->
+                            <field name='currency_id' invisible='1' />
+                            <field name='cost_currency_id' invisible='1' />
+
+                            <!-- Default fields -->
+                            <field name='name' />
+                            <field name='default_code' optional="show" />
+                            <field name='categ_id' optional="show" />
+                            <field name='product_tag_ids' optional="show" />
+                            <field name='list_price' widget='monetary' optional='show'
+                                options="{'currency_field': 'currency_id'}" />
+
+                            <!-- Optional fields -->
+                            <field name='barcode' optional='hide' />
+                            <field name='detailed_type' optional='hide' />
+                            <field name='qty_available' optional='hide' />
+                            <field name="standard_price" widget='hide'
+                                options="{'currency_field': 'cost_currency_id'}" optional="hide" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+
+            <!-- adds smart button to view -->
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="get_variants" type="object" string="Product Variants"
+                    class="oe_stat_button">
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

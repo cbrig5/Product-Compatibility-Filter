@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Classification filter left side -->
+    <template inherit_id="website_sale.filter_products_price" id="classification_filter">
+        <xpath expr="//div[@id='o_wsale_price_range_option']" position="after">
+            <form class="js_attributes position-relative mb-2" method="get">
+                <div class="accordion-item nav-item mb-1">
+                    <h6 class="mb-3">
+                        <b class="o_products_attributes_title d-none d-lg-block">Class</b>
+                    </h6>
+                    <div class="" t-attf-id="o_products_classification">
+                        <select class="form-select css_attribute_select mb-2" name="class_id">
+                            <option value="" selected="true">-</option>
+                            <t t-foreach="product_classification" t-as="class">
+                                <option t-att-value="class.id"
+                                    t-att-selected="class.id == selected_class_id">
+                                    <t t-esc="class.name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+
+                <t t-if="products_in_class">
+                    <div class="accordion-item nav-item mb-1">
+                        <h6 class="mb-3">
+                            <b class="o_products_products_title d-none d-lg-block">Products</b>
+                        </h6>
+                        <div class="" t-attf-id="o_products_products">
+                            <select class="form-select css_attribute_select mb-2" name="product_id">
+                                <option value="" selected="true">-</option>
+                                <t t-foreach="products_in_class" t-as="prod">
+                                    <option t-att-value="prod.id"
+                                        t-att-selected="prod.id == selected_prod_id">
+                                        <t t-esc="prod.name" />
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                </t>
+            </form>
+
+            <a
+                t-attf-class="btn btn-{{navClass}} py-2 mb-2 my-3 {{(not selected_class_id) and 'disabled' }}"
+                t-att-aria-disabled="(selected_class_id) and 'true' or 'false'"
+                href="/shop"
+                title="Clear Selections">
+                <b>Clear Selections</b>
+            </a>
+
+        </xpath>
+    </template>
+
+    <!-- Attributes filter for classification nav bar -->
+    <template inherit_id="website_sale.filmstrip_categories" id="classification_attributes_filter">
+        <xpath expr="//div[hasclass('o_wsale_filmstip_wrapper')]" position="replace">
+            <t t-if="selected_class_id">
+                <form method="get">
+                    <t t-if="filter_by_specs">
+                        <div class="o_wsale_filmstip_container d-flex align-items-stretch mb-2 overflow-hidden">
+                            <t t-if="not selected_prod_id">
+                                <t t-foreach="compat_attrs" t-as='att'>
+                                    <select class="form-select css attribute_select mb-2 mx-1"
+                                        onchange="handleValueChange(this,'specs')">
+                                        <option value="" selected="true" disabled="true">
+                                            <t t-esc='att.name' />
+                                        </option>
+                                        <t
+                                            t-foreach="request.env['specification.line'].search([('product_specification_name_id', '=', att.id)]).product_specification_value_id"
+                                            t-as="val">
+                                            <option t-att-value="'%s-%s' % (att.id, val.id)">
+                                                <t t-esc="val.name" />
+                                                <t t-if="val.id in specs_set">
+                                                    <span style="color: green;">&#10003;</span> <!-- styling doesn't work -->
+                                                </t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </t>
+                                <a
+                                    t-attf-class="btn btn-{{navClass}} d-flex py-1 mb-2 mx-2 {{(not specs_set) and 'disabled' }}"
+                                    t-att-aria-disabled="(not spec_sets) and 'true' or 'false'"
+                                    t-attf-href="/shop?class_id={{selected_class_id}}"
+                                    title="Clear Specifications">
+                                    <b>Clear Specifications</b>
+                                </a>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="o_wsale_filmstip_container d-flex align-items-stretch mb-2 overflow-hidden">
+                            <t t-if="compat_attrs_all">
+                                <t t-foreach="compat_attrs_all" t-as='att'>
+                                    <select class="form-select css attribute_select mb-2 mx-1" name="variants" onchange="handleValueChange(this, 'variants')">
+                                        <option value="" selected="true" disabled="true" hidden="true">
+                                            <t t-esc='att.name'/>
+                                        </option>
+                                        <t t-foreach="att.value_ids" t-as="val">
+                                            <option t-att-value="val.id">
+                                                <t t-esc="val.name"/>
+                                                <t t-if="val.id in variants_values">
+                                                    <span style="color: green;">&#10003;</span>
+                                                </t>
+                                            </option> 
+                                        </t>
+                                    </select>
+                                </t>
+                            </t>
+                            <t t-if="compat_attrs_prod">
+                                <t t-foreach="compat_attrs_prod" t-as='att'>
+                                    <select class="form-select css attribute_select mb-2 mx-1" name="variants" onchange="handleValueChange(this, 'variants')">
+                                        <option value="" selected="true" disabled="true" hidden="true">
+                                            <t t-esc='att.display_name'/>
+                                        </option>
+                                        <t t-foreach="att.product_template_value_ids" t-as="val">
+                                            <option t-att-value="val.id">
+                                                <t t-esc="val.name"/>
+                                                <t t-if="val.id in variants_values">
+                                                    <span style="color: green;">&#10003;</span>
+                                                </t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </t>
+                            </t>
+                            <a t-attf-class="btn btn-{{navClass}} d-flex py-1 mb-2 mx-2 {{(not variants_values) and 'disabled' }}"
+                            t-att-aria-disabled="(not variants_values) and 'true' or 'false'"
+                            t-attf-href="/shop?class_id={{selected_class_id}}&#38;product_id={{selected_prod_id or ''}}"
+                            title="Clear Specifications">
+                            <b>Clear Variants</b>
+                            </a>
+                        </div>
+                    </t>
+                </form>
+            </t>
+            <t t-else="">
+                <div t-if="entries"
+                    class="o_wsale_filmstip_container d-flex align-items-stretch mb-2 overflow-hidden">
+                    <div class="o_wsale_filmstip_wrapper pb-1 mb-2 overflow-auto">
+                        <ul
+                            class="o_wsale_filmstip d-flex align-items-stretch mb-0 list-unstyled overflow-visible">
+                            <t t-foreach="entries" t-as="c" t-if="c.image_128"
+                                t-set="atLeastOneImage" t-value="True" />
+                            <t t-if="category.parent_id" t-set="backUrl"
+                                t-value="keep('/shop/category/' + slug(category.parent_id), category=0)" />
+                            <t t-else="" t-set="backUrl" t-value="'/shop'" />
+
+                            <li t-foreach="entries" t-as="c"
+                                t-attf-class="d-flex {{'pe-3' if not c_last else ''}}"
+                                t-att-data-link-href="keep('/shop/category/' + slug(c), category=0)">
+                                <input type="radio"
+                                    t-attf-name="wsale_categories_top_radios_{{parentCategoryId}}"
+                                    class="btn-check pe-none" t-att-id="c.id" t-att-value="c.id"
+                                    t-att-checked="'true' if c.id == category.id else None" />
+
+                                <div
+                                    t-attf-class=" btn btn-{{navClass}} d-flex align-items-center {{'ps-2 pe-3' if c.image_128 else 'px-4'}} fs-6 fw-normal {{ 'border-primary' if c.id == category.id else '' }}"
+                                    t-att-for="c.id">
+                                    <div t-if="c.image_128"
+                                        t-attf-style="background-image:url('data:image/png;base64,#{c.image_128}')"
+                                        class="o_image_40_cover oe_img_bg o_bg_img_center rounded-3 me-3"
+                                        t-att-alt="c.name " />
+                                    <span t-field="c.name" />
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Product Page -->
+    <template inherit_id="website_sale.product" id="combinations_with_filter">
+        <xpath expr="//form//div[@id='o_wsale_cta_wrapper']" position="before">
+            <t t-if="variants">
+                <t t-if="product._get_all_compatible_variants(variants)">
+                    <p class="alert alert-warning">Compatible Combinations with Filters:<br/>
+                        <t t-foreach="product._get_all_compatible_variants(variants)" t-as="comb">
+                            <t t-esc="comb"/><br/>
+                        </t>
+                    </p>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

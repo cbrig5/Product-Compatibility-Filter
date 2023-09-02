@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_classification_user,product.classification.user,model_product_classification,base.group_user,1,1,1,1
+access_product_classification_manager,product.classification.manager,model_product_classification,base.group_system,1,1,1,1
+access_specification_name_user,specification.name.user,model_specification_name,base.group_user,1,1,1,1
+access_specification_name_manager,specification.name.manager,model_specification_name,base.group_system,1,1,1,1
+access_specification_value_user,specification.value.user,model_specification_value,base.group_user,1,1,1,1
+access_specification_value_manager,specification.value.manager,model_specification_value,base.group_system,1,1,1,1
+access_specification_line_user,specification.line.user,model_specification_line,base.group_user,1,1,1,1
+access_specification_line_manager,specification.line.manager,model_specification_line,base.group_system,1,1,1,1

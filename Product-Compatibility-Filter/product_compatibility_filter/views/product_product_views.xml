@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="product_product_normal_form_inherit_compatibility" model='ir.ui.view'>
+        <field name="name">product.product.normal.form.inherit.compatability</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='detailed_type']" position="after">
+                <field name='is_part' />
+                <field name='part_compatibility' widget="many2many_tags"
+                    options="{'no_create_edit': False}"
+                    attrs="{'invisible': [('is_part', '=', False)]}" readonly="1" />
+                <field name="product_classification" options="{'no_create_edit': False}"
+                    attrs="{'invisible': [('is_part', '=', True)]}" readonly="1" />
+                <field name='part_compatibility_status' attrs="{'invisible':1}" />
+            </xpath>
+
+            <!-- Products Compatibility Page-->
+            <xpath expr="//page[@name='general_information']" position="after">
+                <page string="Products"
+                    attrs="{'invisible': ['|',('part_compatibility_status', '=', False), ('is_part', '=', False)]}">
+                    <field name='products' invisible="1" />
+                    <field name="compatible_prods" domain="[('id', 'in', products)]">
+                        <tree>
+                            <!-- Invisible fields -->
+                            <field name='currency_id' invisible='1' />
+                            <field name='cost_currency_id' invisible='1' />
+
+                            <!-- Default fields -->
+                            <field name='name' />
+                            <field name='product_template_variant_value_ids' optional="show"
+                                widget="many2many_tags" />
+                            <field name='default_code' optional="show" />
+                            <field name='categ_id' optional="show" />
+                            <field name="standard_price" widget='monetary'
+                                options="{'currency_field': 'cost_currency_id'}" optional="show" />
+
+                            <!-- Optional fields -->
+                            <field name='barcode' optional='hide' />
+                            <field name='detailed_type' optional='hide' />
+                            <field name='qty_available' optional='hide' />
+                            <field name='list_price' optional='hide'
+                                options="{'currency_field': 'currency_id'}" />
+                            <field name='product_tag_ids' optional="hide" />
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="product_product_tree_view_compatibility" model="ir.ui.view">
+        <field name="name">product.product.tree.view.compatibility</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_template_variant_value_ids']" position="after">
+                <field name="is_part" optional="show" readonly="1" />
+                <field name="classification" optional="show" readonly="1" />
+            </xpath>
+        </field>
+    </record>
+</odoo>
