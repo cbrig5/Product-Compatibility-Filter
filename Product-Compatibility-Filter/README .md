@@ -1,4 +1,4 @@
-# cobr & tule product compatibility filter
+# Corey Bright and Tu Le product compatibility filter
 
 
 
